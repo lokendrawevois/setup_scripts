@@ -1,2 +1,3 @@
 export GEMINI_API_KEY=...
+
 nohup bash setup.sh > setup.log 2>&1 &
