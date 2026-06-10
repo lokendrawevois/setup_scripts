@@ -33,6 +33,5 @@ yolo detect train \
   epochs=10 \
   imgsz=640
 
-echo "=== Training output ==="
-ls -lah "$HOME/pipeline/runs/detect/train"
-
+echo "=== Training output ===, locally it won't point to this, just for runpod"
+ls -lah "pipeline/runs/detect/train"
