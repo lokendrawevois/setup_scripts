@@ -1,3 +1,12 @@
+if [ -z "${GEMINI_API_KEY:-}" ]; then
+    echo "ERROR: GEMINI_API_KEY is not set."
+    echo "Please export it before running the script:"
+    echo "export GEMINI_API_KEY='your-api-key'"
+    exit 1
+fi
+
+echo "$(date '+%Y-%m-%d %H:%M:%S') GEMINI_API_KEY detected."
+
 git clone https://github.com/lokendrawevois/pipeline.git
 
 UV_VENV_CLEAR=1
