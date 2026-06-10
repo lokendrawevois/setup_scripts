@@ -14,7 +14,7 @@ source .venv/bin/activate
 
 uv pip install -r requirements.txt
 
-.venv/bin/python full_pipeline.py --video sample.mp4 --prompt trash --skip 100
+.venv/bin/python full_pipeline.py --video sample.mp4 --prompt trash --skip 10
 
 LATEST_RUN=$(ls -td outputs/*/ | head -n 1)
 
