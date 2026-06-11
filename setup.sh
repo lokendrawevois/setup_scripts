@@ -11,6 +11,8 @@ git clone https://github.com/lokendrawevois/pipeline.git
 
 wget https://huggingface.co/bodhicitta/sam3/resolve/main/sam3.pt -O pipeline/sam3.pt
 
+wget https://huggingface.co/Ultralytics/YOLO11/resolve/main/yolo11n.pt -O pipeline/yolo11n.pt
+
 cd pipeline
 
 uv venv --python 3.9.6
@@ -33,6 +35,7 @@ python classify.py \
 cd "${LATEST_RUN}yolo_training" || exit 1
 
 yolo detect train \
+  model=../../../yolo11n.pt \
   data=data.yaml \
   epochs=100 \
   imgsz=640
