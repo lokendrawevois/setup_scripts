@@ -5,6 +5,13 @@ if [ -z "${GEMINI_API_KEY:-}" ]; then
     exit 1
 fi
 
+if [ -z "${GOOGLE_APPLICATION_CREDENTIALS:-}" ]; then
+    echo "ERROR: GOOGLE_APPLICATION_CREDENTIALS is not set."
+    echo "Please export it before running the script:"
+    echo "export GOOGLE_APPLICATION_CREDENTIALS='your-api-key'"
+    exit 1
+fi
+
 echo "$(date '+%Y-%m-%d %H:%M:%S') GEMINI_API_KEY detected."
 
 git clone https://github.com/lokendrawevois/pipeline.git
@@ -20,6 +27,8 @@ uv venv --python 3.9.6
 source .venv/bin/activate
 
 uv pip install -r requirements.txt
+
+python download_training_data.py
 
 python full_pipeline.py --video sample.mp4 --prompt trash --skip 10
 
