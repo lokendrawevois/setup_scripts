@@ -48,3 +48,15 @@ yolo detect train \
   data=data.yaml \
   epochs=100 \
   imgsz=640
+
+BEST_MODEL=$(find runs/detect -path "*/weights/best.pt" -type f -exec ls -t {} + | head -n 1)
+
+if [ -z "${BEST_MODEL:-}" ]; then
+    echo "ERROR: Could not find YOLO best.pt after training."
+    exit 1
+fi
+
+echo "Uploading trained model: $BEST_MODEL"
+
+python ../../../upload_model.py \
+  --model "$BEST_MODEL"
