@@ -16,9 +16,17 @@ echo "$(date '+%Y-%m-%d %H:%M:%S') GEMINI_API_KEY detected."
 
 git clone https://github.com/lokendrawevois/pipeline.git
 
-wget https://huggingface.co/bodhicitta/sam3/resolve/main/sam3.pt -O pipeline/sam3.pt
+if [ ! -f pipeline/sam3.pt ]; then
+    wget https://huggingface.co/bodhicitta/sam3/resolve/main/sam3.pt -O pipeline/sam3.pt
+else
+    echo "sam3.pt already exists, skipping download."
+fi
 
-wget https://huggingface.co/Ultralytics/YOLO11/resolve/main/yolo11n.pt -O pipeline/yolo11n.pt
+if [ ! -f pipeline/yolo11n.pt ]; then
+    wget https://huggingface.co/Ultralytics/YOLO11/resolve/main/yolo11n.pt -O pipeline/yolo11n.pt
+else
+    echo "yolo11n.pt already exists, skipping download."
+fi
 
 cd pipeline
 
