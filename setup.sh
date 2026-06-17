@@ -12,15 +12,26 @@ if [ -z "${GOOGLE_APPLICATION_CREDENTIALS:-}" ]; then
     exit 1
 fi
 
+if [ -z "${YOLO_MODEL_PATH:-}" ]; then
+    echo "ERROR: YOLO_MODEL_PATH is not set."
+    echo "Please export it before running the script:"
+    echo "export YOLO_MODEL_PATH='/absolute/path/to/best.pt'"
+    exit 1
+fi
+
 echo "$(date '+%Y-%m-%d %H:%M:%S') GEMINI_API_KEY detected."
 
 git clone https://github.com/lokendrawevois/pipeline.git
+
+echo "SAM3 download section"
 
 if [ ! -f pipeline/sam3.pt ]; then
     wget https://huggingface.co/bodhicitta/sam3/resolve/main/sam3.pt -O pipeline/sam3.pt
 else
     echo "sam3.pt already exists, skipping download."
 fi
+
+echo "SAM3 download section end"
 
 if [ ! -f pipeline/yolo11n.pt ]; then
     wget https://huggingface.co/Ultralytics/YOLO11/resolve/main/yolo11n.pt -O pipeline/yolo11n.pt
@@ -38,7 +49,7 @@ uv pip install -r requirements.txt
 
 python download_training_data.py
 
-python full_pipeline.py --video sample.mp4 --prompt trash --skip 10
+#python full_pipeline.py --video sample.mp4 --prompt trash --skip 10
 
 LATEST_RUN=$(ls -td outputs/*/ | head -n 1)
 
@@ -52,7 +63,7 @@ python classify.py \
 cd "${LATEST_RUN}yolo_training" || exit 1
 
 yolo detect train \
-  model=../../../yolo11n.pt \
+  model="$YOLO_MODEL_PATH" \
   data=data.yaml \
   epochs=100 \
   imgsz=640
