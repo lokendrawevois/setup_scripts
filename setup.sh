@@ -49,7 +49,7 @@ uv pip install -r requirements.txt
 
 python download_training_data.py
 
-python full_pipeline.py --video sample.mp4 --prompt trash --skip 10
+python full_pipeline.py --video train.mp4 --prompt trash --skip 10
 
 LATEST_RUN=$(ls -td outputs/*/ | head -n 1)
 
