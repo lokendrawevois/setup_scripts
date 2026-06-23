@@ -49,18 +49,46 @@ uv pip install -r requirements.txt
 
 python download_training_data.py
 
-python sam3_pipeline.py --video train.mp4 --prompt trash --skip 10
+# ===== NEW: Split processing into parts and merge =====
+PARTS=5   # Number of parts (can be changed)
 
-LATEST_RUN=$(ls -td outputs/*/ | head -n 1)
+# Create a timestamped base directory for this run (same style as before)
+TIMESTAMP=$(date '+%Y%m%d_%H%M%S')
+BASE_DIR="outputs/${TIMESTAMP}_parts"
+mkdir -p "$BASE_DIR"
 
-echo "Latest run directory: $LATEST_RUN"
+echo "Processing video in $PARTS parts, base dir: $BASE_DIR"
 
+# Run sam3_pipeline.py for each part
+for i in $(seq 1 $PARTS); do
+    PART_DIR="$BASE_DIR/part_$(printf "%02d" $i)"
+    mkdir -p "$PART_DIR"
+    echo "Running part $i/$PARTS -> $PART_DIR"
+    python sam3_pipeline.py \
+        --video train.mp4 \
+        --prompt trash \
+        --skip 10 \
+        --part "$i/$PARTS" \
+        --output "$PART_DIR"
+done
+
+# Merge all parts
+MERGED_DIR="$BASE_DIR/merged"
+echo "Merging all parts into $MERGED_DIR"
+python merger.py --dirs "$BASE_DIR"/part_* --output "$MERGED_DIR"
+
+# Set LATEST_RUN to the merged directory (for subsequent steps)
+LATEST_RUN="$MERGED_DIR"
+echo "Latest run directory (merged): $LATEST_RUN"
+# ===== End of new section =====
+
+# Continue with classification and training as before
 python classify.py \
     --run_dir "$LATEST_RUN" \
     --max_workers 10 \
     --frame_workers 10
 
-cd "${LATEST_RUN}yolo_training" || exit 1
+cd "${LATEST_RUN}/yolo_training" || exit 1
 
 yolo detect train \
   model="$YOLO_MODEL_PATH" \
