@@ -46,8 +46,8 @@ else
 fi
 echo "SAM3 download section end"
 
-if [ ! -f pipeline/yolo11n.pt ]; then
-    wget https://huggingface.co/Ultralytics/YOLO11/resolve/main/yolo26n.pt -O pipeline/yolo26n.pt
+if [ ! -f pipeline/yolo26n.pt ]; then
+    wget https://huggingface.co/Ultralytics/YOLO26/resolve/main/yolo26n.pt -O pipeline/yolo26n.pt
 else
     echo "yolo11n.pt already exists, skipping download."
 fi
