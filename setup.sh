@@ -97,4 +97,4 @@ yolo detect train \
   imgsz=640
 
 echo "Uploading trained model:"
-python ../../../upload_model.py --model ../../../runs/detect/train/weights/best.pt
+python ../../../../upload_model.py --model ../../../../runs/detect/train/weights/best.pt
