@@ -65,7 +65,7 @@ for i in $(seq 1 $PARTS); do
     mkdir -p "$PART_DIR"
     echo "Running part $i/$PARTS -> $PART_DIR"
     python sam3_pipeline.py \
-        --video train.mp4 \
+        --video test.mp4 \
         --prompt trash \
         --skip 10 \
         --part "$i/$PARTS" \
