@@ -146,7 +146,7 @@ for i in $(seq 1 $PARTS); do
     (
         source .venv/bin/activate
         python sam3_pipeline.py \
-            --video test.mp4 \
+            --video train.mp4 \
             --prompt trash \
             --skip 10 \
             --part "$i/$PARTS" \
