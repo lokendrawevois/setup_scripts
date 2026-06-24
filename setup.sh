@@ -1,5 +1,20 @@
 #!/bin/bash
-set -euo pipefail   # Stop on error, undefined variable, pipefail
+set -euo pipefail
+
+# =============================================================================
+# Benchmark log setup
+# =============================================================================
+BENCHMARK_LOG="benchmark_$(date '+%Y%m%d_%H%M%S').log"
+# If you prefer a fixed name each run, use: BENCHMARK_LOG="benchmark.log"
+
+# Function: write a line to the benchmark log only
+log_benchmark() {
+    # Format: section_name,start_time,end_time,duration_seconds
+    echo "$1,$2,$3,$4" >> "$BENCHMARK_LOG"
+}
+
+# Write a header (optional)
+echo "section,start,end,duration_sec" > "$BENCHMARK_LOG"
 
 # =============================================================================
 # Environment Checks
@@ -31,9 +46,10 @@ echo "$(date '+%Y-%m-%d %H:%M:%S') GEMINI_API_KEY detected."
 # SECTION 1: Clone repository and download models
 # =============================================================================
 SECTION_START=$(date +%s)
+START_TIME=$(date '+%Y-%m-%d %H:%M:%S')
 echo "====================================================="
 echo "SECTION 1 START: Clone repo and download models"
-echo "Start time: $(date '+%Y-%m-%d %H:%M:%S')"
+echo "Start time: $START_TIME"
 echo "====================================================="
 
 git clone https://github.com/lokendrawevois/pipeline.git
@@ -49,11 +65,13 @@ echo "SAM3 download section end"
 if [ ! -f pipeline/yolo26n.pt ]; then
     wget https://huggingface.co/Ultralytics/YOLO26/resolve/main/yolo26n.pt -O pipeline/yolo26n.pt
 else
-    echo "yolo11n.pt already exists, skipping download."
+    echo "yolo26n.pt already exists, skipping download."
 fi
 
 SECTION_END=$(date +%s)
+END_TIME=$(date '+%Y-%m-%d %H:%M:%S')
 DURATION=$((SECTION_END - SECTION_START))
+log_benchmark "SECTION_1" "$START_TIME" "$END_TIME" "$DURATION"   # BENCHMARK
 echo "====================================================="
 echo "SECTION 1 END: Duration: ${DURATION} seconds"
 echo "====================================================="
@@ -62,9 +80,10 @@ echo "====================================================="
 # SECTION 2: Setup Python environment and install dependencies
 # =============================================================================
 SECTION_START=$(date +%s)
+START_TIME=$(date '+%Y-%m-%d %H:%M:%S')
 echo "====================================================="
 echo "SECTION 2 START: Setup Python environment"
-echo "Start time: $(date '+%Y-%m-%d %H:%M:%S')"
+echo "Start time: $START_TIME"
 echo "====================================================="
 
 cd pipeline
@@ -76,7 +95,9 @@ echo "Installing Python dependencies..."
 uv pip install -r requirements.txt
 
 SECTION_END=$(date +%s)
+END_TIME=$(date '+%Y-%m-%d %H:%M:%S')
 DURATION=$((SECTION_END - SECTION_START))
+log_benchmark "SECTION_2" "$START_TIME" "$END_TIME" "$DURATION"   # BENCHMARK
 echo "====================================================="
 echo "SECTION 2 END: Duration: ${DURATION} seconds"
 echo "====================================================="
@@ -85,15 +106,18 @@ echo "====================================================="
 # SECTION 3: Download training data
 # =============================================================================
 SECTION_START=$(date +%s)
+START_TIME=$(date '+%Y-%m-%d %H:%M:%S')
 echo "====================================================="
 echo "SECTION 3 START: Download training data"
-echo "Start time: $(date '+%Y-%m-%d %H:%M:%S')"
+echo "Start time: $START_TIME"
 echo "====================================================="
 
 python download_training_data.py
 
 SECTION_END=$(date +%s)
+END_TIME=$(date '+%Y-%m-%d %H:%M:%S')
 DURATION=$((SECTION_END - SECTION_START))
+log_benchmark "SECTION_3" "$START_TIME" "$END_TIME" "$DURATION"   # BENCHMARK
 echo "====================================================="
 echo "SECTION 3 END: Duration: ${DURATION} seconds"
 echo "====================================================="
@@ -102,25 +126,25 @@ echo "====================================================="
 # SECTION 4: Parallel processing of video parts with SAM3 + merging
 # =============================================================================
 SECTION_START=$(date +%s)
+START_TIME=$(date '+%Y-%m-%d %H:%M:%S')
 echo "====================================================="
 echo "SECTION 4 START: Parallel SAM3 pipeline processing"
-echo "Start time: $(date '+%Y-%m-%d %H:%M:%S')"
+echo "Start time: $START_TIME"
 echo "====================================================="
 
-PARTS=5   # Number of parts (can be changed)
+PARTS=5
 TIMESTAMP=$(date '+%Y%m%d_%H%M%S')
 BASE_DIR="outputs/${TIMESTAMP}_parts"
 mkdir -p "$BASE_DIR"
 
 echo "Will process video in $PARTS parts, base directory: $BASE_DIR"
 
-# Launch all parts in parallel, each in its own subshell
 for i in $(seq 1 $PARTS); do
     PART_DIR="$BASE_DIR/part_$(printf "%02d" $i)"
     mkdir -p "$PART_DIR"
     echo "$(date '+%Y-%m-%d %H:%M:%S') Launching part $i/$PARTS -> $PART_DIR (background)"
     (
-        source .venv/bin/activate       # ensure correct Python environment
+        source .venv/bin/activate
         python sam3_pipeline.py \
             --video test.mp4 \
             --prompt trash \
@@ -131,12 +155,10 @@ for i in $(seq 1 $PARTS); do
     ) &
 done
 
-# Wait for all background jobs to complete
 echo "$(date '+%Y-%m-%d %H:%M:%S') Waiting for all parts to finish..."
 wait
 echo "$(date '+%Y-%m-%d %H:%M:%S') All parts completed."
 
-# Merge all parts
 MERGED_DIR="$BASE_DIR/merged"
 echo "$(date '+%Y-%m-%d %H:%M:%S') Starting merge of all parts into $MERGED_DIR"
 python merger.py --dirs "$BASE_DIR"/part_* --output "$MERGED_DIR"
@@ -146,7 +168,9 @@ LATEST_RUN="$MERGED_DIR"
 echo "Latest run directory (merged): $LATEST_RUN"
 
 SECTION_END=$(date +%s)
+END_TIME=$(date '+%Y-%m-%d %H:%M:%S')
 DURATION=$((SECTION_END - SECTION_START))
+log_benchmark "SECTION_4" "$START_TIME" "$END_TIME" "$DURATION"   # BENCHMARK
 echo "====================================================="
 echo "SECTION 4 END: Duration: ${DURATION} seconds"
 echo "====================================================="
@@ -155,9 +179,10 @@ echo "====================================================="
 # SECTION 5: Classify frames
 # =============================================================================
 SECTION_START=$(date +%s)
+START_TIME=$(date '+%Y-%m-%d %H:%M:%S')
 echo "====================================================="
 echo "SECTION 5 START: Classification"
-echo "Start time: $(date '+%Y-%m-%d %H:%M:%S')"
+echo "Start time: $START_TIME"
 echo "====================================================="
 
 python classify.py \
@@ -166,7 +191,9 @@ python classify.py \
     --frame_workers 10
 
 SECTION_END=$(date +%s)
+END_TIME=$(date '+%Y-%m-%d %H:%M:%S')
 DURATION=$((SECTION_END - SECTION_START))
+log_benchmark "SECTION_5" "$START_TIME" "$END_TIME" "$DURATION"   # BENCHMARK
 echo "====================================================="
 echo "SECTION 5 END: Duration: ${DURATION} seconds"
 echo "====================================================="
@@ -175,9 +202,10 @@ echo "====================================================="
 # SECTION 6: YOLO training
 # =============================================================================
 SECTION_START=$(date +%s)
+START_TIME=$(date '+%Y-%m-%d %H:%M:%S')
 echo "====================================================="
 echo "SECTION 6 START: YOLO training"
-echo "Start time: $(date '+%Y-%m-%d %H:%M:%S')"
+echo "Start time: $START_TIME"
 echo "====================================================="
 
 cd "${LATEST_RUN}/yolo_training" || exit 1
@@ -189,14 +217,19 @@ yolo detect train \
   imgsz=640
 
 echo "Uploading trained model:"
-# NOTE: adjust relative paths if your directory structure differs
 python ../../../../upload_model.py --model ../../../../runs/detect/train/weights/best.pt
 
 SECTION_END=$(date +%s)
+END_TIME=$(date '+%Y-%m-%d %H:%M:%S')
 DURATION=$((SECTION_END - SECTION_START))
+log_benchmark "SECTION_6" "$START_TIME" "$END_TIME" "$DURATION"   # BENCHMARK
 echo "====================================================="
 echo "SECTION 6 END: Duration: ${DURATION} seconds"
 echo "====================================================="
 
+# =============================================================================
+# Overall script duration (optional extra benchmark line)
+# =============================================================================
 echo ""
 echo "All sections completed successfully at $(date '+%Y-%m-%d %H:%M:%S')."
+echo "Benchmark data written to $BENCHMARK_LOG"
