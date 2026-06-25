@@ -1,20 +1,5 @@
 #!/bin/bash
-set -euo pipefail
 
-# =============================================================================
-# Benchmark log setup
-# =============================================================================
-BENCHMARK_LOG="benchmark_$(date '+%Y%m%d_%H%M%S').log"
-# If you prefer a fixed name each run, use: BENCHMARK_LOG="benchmark.log"
-
-# Function: write a line to the benchmark log only
-log_benchmark() {
-    # Format: section_name,start_time,end_time,duration_seconds
-    echo "$1,$2,$3,$4" >> "$BENCHMARK_LOG"
-}
-
-# Write a header (optional)
-echo "section,start,end,duration_sec" > "$BENCHMARK_LOG"
 
 # =============================================================================
 # Environment Checks
@@ -71,7 +56,6 @@ fi
 SECTION_END=$(date +%s)
 END_TIME=$(date '+%Y-%m-%d %H:%M:%S')
 DURATION=$((SECTION_END - SECTION_START))
-log_benchmark "SECTION_1" "$START_TIME" "$END_TIME" "$DURATION"   # BENCHMARK
 echo "====================================================="
 echo "SECTION 1 END: Duration: ${DURATION} seconds"
 echo "====================================================="
@@ -97,7 +81,6 @@ uv pip install -r requirements.txt
 SECTION_END=$(date +%s)
 END_TIME=$(date '+%Y-%m-%d %H:%M:%S')
 DURATION=$((SECTION_END - SECTION_START))
-log_benchmark "SECTION_2" "$START_TIME" "$END_TIME" "$DURATION"   # BENCHMARK
 echo "====================================================="
 echo "SECTION 2 END: Duration: ${DURATION} seconds"
 echo "====================================================="
@@ -117,7 +100,6 @@ python download_training_data.py
 SECTION_END=$(date +%s)
 END_TIME=$(date '+%Y-%m-%d %H:%M:%S')
 DURATION=$((SECTION_END - SECTION_START))
-log_benchmark "SECTION_3" "$START_TIME" "$END_TIME" "$DURATION"   # BENCHMARK
 echo "====================================================="
 echo "SECTION 3 END: Duration: ${DURATION} seconds"
 echo "====================================================="
@@ -170,7 +152,6 @@ echo "Latest run directory (merged): $LATEST_RUN"
 SECTION_END=$(date +%s)
 END_TIME=$(date '+%Y-%m-%d %H:%M:%S')
 DURATION=$((SECTION_END - SECTION_START))
-log_benchmark "SECTION_4" "$START_TIME" "$END_TIME" "$DURATION"   # BENCHMARK
 echo "====================================================="
 echo "SECTION 4 END: Duration: ${DURATION} seconds"
 echo "====================================================="
@@ -193,7 +174,6 @@ python classify.py \
 SECTION_END=$(date +%s)
 END_TIME=$(date '+%Y-%m-%d %H:%M:%S')
 DURATION=$((SECTION_END - SECTION_START))
-log_benchmark "SECTION_5" "$START_TIME" "$END_TIME" "$DURATION"   # BENCHMARK
 echo "====================================================="
 echo "SECTION 5 END: Duration: ${DURATION} seconds"
 echo "====================================================="
@@ -222,14 +202,12 @@ python ../../../../upload_model.py --model ../../../../runs/detect/train/weights
 SECTION_END=$(date +%s)
 END_TIME=$(date '+%Y-%m-%d %H:%M:%S')
 DURATION=$((SECTION_END - SECTION_START))
-log_benchmark "SECTION_6" "$START_TIME" "$END_TIME" "$DURATION"   # BENCHMARK
 echo "====================================================="
 echo "SECTION 6 END: Duration: ${DURATION} seconds"
 echo "====================================================="
 
 # =============================================================================
-# Overall script duration (optional extra benchmark line)
+# Overall script duration
 # =============================================================================
 echo ""
 echo "All sections completed successfully at $(date '+%Y-%m-%d %H:%M:%S')."
-echo "Benchmark data written to $BENCHMARK_LOG"
