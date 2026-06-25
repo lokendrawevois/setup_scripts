@@ -115,9 +115,14 @@ echo "Start time: $START_TIME"
 echo "====================================================="
 
 PARTS=5
-TIMESTAMP=$(date '+%Y%m%d_%H%M%S')
-BASE_DIR="outputs/${TIMESTAMP}_parts"
-mkdir -p "$BASE_DIR"
+BASE_DIR="outputs/current_parts"
+
+if [ -d "$BASE_DIR" ]; then
+    echo "Using existing directory: $BASE_DIR"
+else
+    mkdir -p "$BASE_DIR"
+    echo "Created directory: $BASE_DIR"
+fi
 
 echo "Will process video in $PARTS parts, base directory: $BASE_DIR"
 
