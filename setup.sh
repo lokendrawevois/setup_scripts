@@ -114,7 +114,7 @@ echo "SECTION 4 START: Parallel SAM3 pipeline processing"
 echo "Start time: $START_TIME"
 echo "====================================================="
 
-PARTS=5
+PARTS=1
 BASE_DIR="outputs/current_parts"
 
 if [ -d "$BASE_DIR" ]; then
