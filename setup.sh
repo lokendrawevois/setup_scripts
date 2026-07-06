@@ -173,8 +173,8 @@ echo "====================================================="
 
 python classify.py \
     --run_dir "$LATEST_RUN" \
-    --max_workers 10 \
-    --frame_workers 10
+    --max_workers 50 \
+    --frame_workers 50
 
 SECTION_END=$(date +%s)
 END_TIME=$(date '+%Y-%m-%d %H:%M:%S')
