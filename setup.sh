@@ -198,7 +198,7 @@ cd "${LATEST_RUN}/yolo_training" || exit 1
 yolo detect train \
   model="$YOLO_MODEL_PATH" \
   data=data.yaml \
-  epochs=100 \
+  epochs=200 \
   imgsz=640
 
 echo "Uploading trained model:"
