@@ -147,6 +147,9 @@ wait
 echo "$(date '+%Y-%m-%d %H:%M:%S') All parts completed."
 
 MERGED_DIR="$BASE_DIR/merged"
+
+rm -f "$MERGED_DIR"/*.jpg
+
 echo "$(date '+%Y-%m-%d %H:%M:%S') Starting merge of all parts into $MERGED_DIR"
 python merger.py --dirs "$BASE_DIR"/part_* --output "$MERGED_DIR"
 echo "$(date '+%Y-%m-%d %H:%M:%S') Merge completed."
