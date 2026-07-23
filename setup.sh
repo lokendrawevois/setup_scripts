@@ -135,7 +135,7 @@ for i in $(seq 1 $PARTS); do
         python sam3_pipeline.py \
             --video train.mp4 \
             --prompt trash \
-            --skip 10 \
+            --skip 20 \
             --part "$i/$PARTS" \
             --output "$PART_DIR"
         echo "$(date '+%Y-%m-%d %H:%M:%S') Part $i finished."
