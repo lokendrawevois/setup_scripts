@@ -95,7 +95,7 @@ echo "SECTION 3 START: Download training data"
 echo "Start time: $START_TIME"
 echo "====================================================="
 
-python download_training_data.py training-data/train.mp4
+python download_training_data.py training-data/train_big.mp4
 
 SECTION_END=$(date +%s)
 END_TIME=$(date '+%Y-%m-%d %H:%M:%S')
